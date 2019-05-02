@@ -1,0 +1,103 @@
+diff --git a/train_emotion_classifier.py b/train_emotion_classifier.py
+index 93433cd..4b7d003 100644
+--- a/train_emotion_classifier.py
++++ b/train_emotion_classifier.py
+@@ -1,6 +1,18 @@
+-from keras.layers import Dense, Flatten
+-from keras.models import Sequential
++import os
++import sys
++import glob
++import argparse
++
++from keras import __version__
++from keras.applications.inception_v3 import InceptionV3, preprocess_input
++
++from keras.preprocessing.image import ImageDataGenerator
++import wandb
++from wandb.keras import WandbCallback
++from keras.layers import Dense, Flatten, GlobalAveragePooling2D 
++from keras.models import Sequential, Model
+ from keras.callbacks import Callback
++from keras.optimizers import SGD
+ import pandas as pd
+ import numpy as np
+ import cv2
+@@ -8,18 +20,42 @@ from PIL import Image
+ import keras
+ import subprocess
+ import os
++from keras.layers import Conv2D, MaxPooling2D, Dropout, Dense, Flatten
++
+ 
+ import wandb
+ from wandb.keras import WandbCallback
+ 
+ run = wandb.init()
+ config = run.config
+-
++config.first_layer_convs = 32
++config.first_layer_conv_width = 3
++config.first_layer_conv_height = 3
++config.dropout = 0.2
++config.dense_layer_size = 128
++config.img_width = 299
++config.img_height = 299
+ config.batch_size = 32
+ config.num_epochs = 20
+ 
+ input_shape = (48, 48, 1)
+ 
++NB_IV3_LAYERS_TO_FREEZE = 172
++
++def add_new_last_layer(base_model, nb_classes):
++    """Add last layer to the convnet
++    Args:
++        base_model: keras model excluding top
++        nb_classes: # of classes
++    Returns:
++        new keras model with last layer
++      """
++    x = base_model.output
++    x = Dense(config.fc_size, activation='relu')(x) #new FC layer, random init
++    predictions = Dense(nb_classes, activation='softmax')(x) #new softmax layer
++    model = Model(inputs=base_model.input, outputs=predictions)
++    return model
++
+ def load_fer2013():
+     if not os.path.exists("fer2013"):
+         print("Downloading the face emotion dataset...")
+@@ -44,6 +80,7 @@ def load_fer2013():
+     
+     return train_faces, train_emotions, val_faces, val_emotions
+ 
++
+ # loading dataset
+ 
+ train_faces, train_emotions, val_faces, val_emotions = load_fer2013()
+@@ -53,12 +90,24 @@ train_faces /= 255.
+ val_faces /= 255.
+ 
+ model = Sequential()
++model.add(Conv2D(32,
++                 (config.first_layer_conv_width, config.first_layer_conv_height),
++                 input_shape=(48, 48, 1),
++                 activation='relu'))
++model.add(MaxPooling2D(pool_size=(2, 2)))
++model.add(Dropout(0.5))
++model.add(Conv2D(64,(4,4),
++                 activation='relu'))
++model.add(MaxPooling2D(pool_size=(4,4)))
++model.add(Dropout(0.5))
+ model.add(Flatten(input_shape=input_shape))
++model.add(Dense(config.dense_layer_size, activation='relu'))
++model.add(Dense(config.dense_layer_size, activation='relu'))
+ model.add(Dense(num_classes, activation="softmax"))
+ 
+ model.compile(optimizer='adam', loss='categorical_crossentropy',
+ metrics=['accuracy'])
+-
++config.total_params = model.count_params()
+ model.fit(train_faces, train_emotions, batch_size=config.batch_size,
+         epochs=config.num_epochs, verbose=1, callbacks=[
+             WandbCallback(data_type="image", labels=["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"])

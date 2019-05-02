@@ -1,0 +1,6 @@
+train_emotion_classifier.py:86: FutureWarning: Method .as_matrix will be removed in a future version. Use .values instead.
+  emotions = pd.get_dummies(data['emotion']).as_matrix()
+Traceback (most recent call last):
+  File "train_emotion_classifier.py", line 117, in <module>
+    nb_train_samples = get_nb_files(train_faces)
+NameError: name 'get_nb_files' is not defined

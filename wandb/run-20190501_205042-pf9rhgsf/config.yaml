@@ -1,0 +1,8 @@
+wandb_version: 1
+
+batch_size:
+  desc: null
+  value: 32
+num_epochs:
+  desc: null
+  value: 20

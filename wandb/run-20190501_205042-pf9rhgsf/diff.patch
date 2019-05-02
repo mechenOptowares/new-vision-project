@@ -1,0 +1,30 @@
+diff --git a/train_emotion_classifier.py b/train_emotion_classifier.py
+index 93433cd..333f9e7 100644
+--- a/train_emotion_classifier.py
++++ b/train_emotion_classifier.py
+@@ -53,12 +53,24 @@ train_faces /= 255.
+ val_faces /= 255.
+ 
+ model = Sequential()
++model.add(Conv2D(32,
++                 (config.first_layer_conv_width, config.first_layer_conv_height),
++                 input_shape=(48, 48, 1),
++                 activation='relu'))
++model.add(MaxPooling2D(pool_size=(4, 4)))
++model.add(Dropout(0.5))
++model.add(Conv2D(64,(4,4),
++                 activation='relu'))
++model.add(MaxPooling2D(pool_size=(2, 2)))
++model.add(Dropout(0.5))
+ model.add(Flatten(input_shape=input_shape))
++model.add(Dense(config.dense_layer_size, activation='relu'))
+ model.add(Dense(num_classes, activation="softmax"))
+ 
++
+ model.compile(optimizer='adam', loss='categorical_crossentropy',
+ metrics=['accuracy'])
+-
++config.total_params = model.count_params()
+ model.fit(train_faces, train_emotions, batch_size=config.batch_size,
+         epochs=config.num_epochs, verbose=1, callbacks=[
+             WandbCallback(data_type="image", labels=["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"])

@@ -1,0 +1,6 @@
+train_emotion_classifier.py:87: FutureWarning: Method .as_matrix will be removed in a future version. Use .values instead.
+  emotions = pd.get_dummies(data['emotion']).as_matrix()
+Traceback (most recent call last):
+  File "train_emotion_classifier.py", line 119, in <module>
+    nb_classes = len(glob.glob(train_faces + "/*"))
+TypeError: ufunc 'add' did not contain a loop with signature matching types dtype('<U32') dtype('<U32') dtype('<U32')
