@@ -1,0 +1,32 @@
+wandb_version: 1
+
+batch_size:
+  desc: null
+  value: 32
+dense_layer_size:
+  desc: null
+  value: 128
+dropout:
+  desc: null
+  value: 0.4
+first_layer_conv_height:
+  desc: null
+  value: 6
+first_layer_conv_width:
+  desc: null
+  value: 6
+first_layer_convs:
+  desc: null
+  value: 32
+img_height:
+  desc: null
+  value: 299
+img_width:
+  desc: null
+  value: 299
+num_epochs:
+  desc: null
+  value: 20
+total_params:
+  desc: null
+  value: 312928

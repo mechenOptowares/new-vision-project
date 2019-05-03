@@ -1,0 +1,18 @@
+train_emotion_classifier.py:73: FutureWarning: Method .as_matrix will be removed in a future version. Use .values instead.
+  emotions = pd.get_dummies(data['emotion']).as_matrix()
+WARNING:tensorflow:From /usr/local/lib/python3.6/dist-packages/tensorflow/python/framework/op_def_library.py:263: colocate_with (from tensorflow.python.framework.ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Colocations handled automatically by placer.
+WARNING:tensorflow:From /usr/local/lib/python3.6/dist-packages/keras/backend/tensorflow_backend.py:3445: calling dropout (from tensorflow.python.ops.nn_ops) with keep_prob is deprecated and will be removed in a future version.
+Instructions for updating:
+Please use `rate` instead of `keep_prob`. Rate should be set to `rate = 1 - keep_prob`.
+Traceback (most recent call last):
+  File "train_emotion_classifier.py", line 112, in <module>
+    ], validation_data=(val_faces, val_emotions))
+  File "/usr/local/lib/python3.6/dist-packages/keras/engine/training.py", line 952, in fit
+    batch_size=batch_size)
+  File "/usr/local/lib/python3.6/dist-packages/keras/engine/training.py", line 751, in _standardize_user_data
+    exception_prefix='input')
+  File "/usr/local/lib/python3.6/dist-packages/keras/engine/training_utils.py", line 138, in standardize_input_data
+    str(data_shape))
+ValueError: Error when checking input: expected conv2d_1_input to have shape (28, 28, 1) but got array with shape (48, 48, 1)

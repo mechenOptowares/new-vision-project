@@ -1,0 +1,194 @@
+{
+    "graph": {
+        "_type": "graph",
+        "format": "keras",
+        "nodes": [
+            {
+                "name": "conv2d_1_input",
+                "id": "conv2d_1_input",
+                "class_name": "InputLayer",
+                "output_shape": [
+                    null,
+                    48,
+                    48,
+                    1
+                ],
+                "num_parameters": 0
+            },
+            {
+                "name": "conv2d_1",
+                "id": "conv2d_1",
+                "class_name": "Conv2D",
+                "output_shape": [
+                    null,
+                    46,
+                    46,
+                    32
+                ],
+                "num_parameters": 320
+            },
+            {
+                "name": "max_pooling2d_1",
+                "id": "max_pooling2d_1",
+                "class_name": "MaxPooling2D",
+                "output_shape": [
+                    null,
+                    7,
+                    7,
+                    32
+                ],
+                "num_parameters": 0
+            },
+            {
+                "name": "conv2d_2",
+                "id": "conv2d_2",
+                "class_name": "Conv2D",
+                "output_shape": [
+                    null,
+                    5,
+                    5,
+                    64
+                ],
+                "num_parameters": 18496
+            },
+            {
+                "name": "dropout_1",
+                "id": "dropout_1",
+                "class_name": "Dropout",
+                "output_shape": [
+                    null,
+                    5,
+                    5,
+                    64
+                ],
+                "num_parameters": 0
+            },
+            {
+                "name": "flatten_1",
+                "id": "flatten_1",
+                "class_name": "Flatten",
+                "output_shape": [
+                    null,
+                    1600
+                ],
+                "num_parameters": 0
+            },
+            {
+                "name": "dense_1",
+                "id": "dense_1",
+                "class_name": "Dense",
+                "output_shape": [
+                    null,
+                    7
+                ],
+                "num_parameters": 11207
+            },
+            {
+                "name": "dense_2",
+                "id": "dense_2",
+                "class_name": "Dense",
+                "output_shape": [
+                    null,
+                    7
+                ],
+                "num_parameters": 56
+            },
+            {
+                "name": "dense_3",
+                "id": "dense_3",
+                "class_name": "Dense",
+                "output_shape": [
+                    null,
+                    7
+                ],
+                "num_parameters": 56
+            }
+        ],
+        "edges": [
+            [
+                "conv2d_1_input",
+                "conv2d_1"
+            ],
+            [
+                "conv2d_1",
+                "max_pooling2d_1"
+            ],
+            [
+                "max_pooling2d_1",
+                "conv2d_2"
+            ],
+            [
+                "conv2d_2",
+                "dropout_1"
+            ],
+            [
+                "dropout_1",
+                "flatten_1"
+            ],
+            [
+                "flatten_1",
+                "dense_1"
+            ],
+            [
+                "dense_1",
+                "dense_2"
+            ],
+            [
+                "dense_2",
+                "dense_3"
+            ]
+        ]
+    },
+    "val_acc": 0.2471440512843702,
+    "val_loss": 3.7423482739716127,
+    "_runtime": 50.30983877182007,
+    "_step": 2,
+    "acc": 0.25267337768643977,
+    "examples": {
+        "width": 48,
+        "height": 48,
+        "count": 36,
+        "_type": "images",
+        "captions": [
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy",
+            "Happy"
+        ]
+    },
+    "_timestamp": 1556907678.680616,
+    "loss": 3.8202942247496052,
+    "epoch": 2
+}

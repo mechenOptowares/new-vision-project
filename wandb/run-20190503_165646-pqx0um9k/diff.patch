@@ -1,0 +1,403 @@
+diff --git a/train_emotion_classifier.py b/train_emotion_classifier.py
+index e1d6ac5..68951a7 100644
+--- a/train_emotion_classifier.py
++++ b/train_emotion_classifier.py
+@@ -29,9 +29,9 @@ from wandb.keras import WandbCallback
+ run = wandb.init()
+ config = run.config
+ config.first_layer_convs = 32
+-config.first_layer_conv_width = 5
+-config.first_layer_conv_height = 5
+-config.dropout = 0.2
++config.first_layer_conv_width = 3
++config.first_layer_conv_height = 3
++config.dropout = 0.4
+ config.dense_layer_size = 128
+ config.img_width = 299
+ config.img_height = 299
+@@ -91,18 +91,16 @@ val_faces /= 255.
+ model = Sequential()
+ model.add(Conv2D(32,
+                  (config.first_layer_conv_width, config.first_layer_conv_height),
+-                 input_shape=(48, 48, 1),
++                 input_shape=(28, 28, 1),
+                  activation='relu'))
+-model.add(MaxPooling2D(pool_size=(4,4)))
+-model.add(Dropout(0.5))
+-model.add(Conv2D(64,(5,5),
++model.add(MaxPooling2D(pool_size=(2,2)))
++model.add(Dropout(0.4))
++model.add(Conv2D(64,(3,3),
+                  activation='relu'))
+-model.add(MaxPooling2D(pool_size=(4,4)))
+-model.add(Dropout(0.5))
++model.add(MaxPooling2D(pool_size=(2,2)))
++model.add(Dropout(0.4))
+ model.add(Flatten(input_shape=input_shape))
+ model.add(Dense(config.dense_layer_size, activation='relu'))
+-model.add(Dense(config.dense_layer_size, activation='relu'))
+-
+ model.add(Dense(num_classes, activation="softmax"))
+ 
+ model.compile(optimizer='adam', loss='categorical_crossentropy',
+diff --git a/wandb/debug.log b/wandb/debug.log
+index 8eb276e..4a0fea5 100644
+--- a/wandb/debug.log
++++ b/wandb/debug.log
+@@ -1,339 +1,17 @@
+-2019-05-01 21:22:39,487 DEBUG   MainThread:9533 [wandb_config.py:_load_defaults():81] no defaults not found in config-defaults.yaml
+-2019-05-01 21:22:39,496 DEBUG   MainThread:9533 [cmd.py:execute():722] Popen(['git', 'cat-file', '--batch-check'], cwd=/home/mechen/vision-project, universal_newlines=False, shell=None)
+-2019-05-01 21:22:39,502 DEBUG   MainThread:9533 [cmd.py:execute():722] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=/home/mechen/vision-project, universal_newlines=False, shell=None)
+-2019-05-01 21:22:39,515 DEBUG   MainThread:9533 [run_manager.py:__init__():452] Initialized sync for emotion-may1/2jyf0w0w
+-2019-05-01 21:22:39,518 INFO    MainThread:9533 [run_manager.py:wrap_existing_process():994] wrapping existing process 9511
+-2019-05-01 21:22:39,519 WARNING MainThread:9533 [io_wrap.py:register():104] SIGWINCH handler was not None: <Handlers.SIG_DFL: 0>
+-2019-05-01 21:22:39,521 DEBUG   MainThread:9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): pypi.org:443
+-2019-05-01 21:22:39,578 DEBUG   MainThread:9533 [connectionpool.py:_make_request():393] https://pypi.org:443 "GET /pypi/wandb/json HTTP/1.1" 200 31060
+-2019-05-01 21:22:39,590 INFO    MainThread:9533 [run_manager.py:init_run():810] system metrics and metadata threads started
+-2019-05-01 21:22:39,590 INFO    MainThread:9533 [run_manager.py:init_run():844] upserting run before process can begin, waiting at most 10 seconds
+-2019-05-01 21:22:39,597 DEBUG   Thread-13 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:22:39,695 DEBUG   Thread-13 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 376
+-2019-05-01 21:22:39,696 INFO    Thread-13 :9533 [run_manager.py:_upsert_run():908] saving patches
+-2019-05-01 21:22:39,697 DEBUG   Thread-13 :9533 [cmd.py:execute():722] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=/home/mechen/vision-project, universal_newlines=False, shell=None)
+-2019-05-01 21:22:39,701 DEBUG   Thread-13 :9533 [cmd.py:execute():722] Popen(['git', 'diff', '--cached', '--abbrev=40', '--full-index', '--raw'], cwd=/home/mechen/vision-project, universal_newlines=False, shell=None)
+-2019-05-01 21:22:39,707 DEBUG   Thread-13 :9533 [cmd.py:execute():722] Popen(['git', 'diff', '--abbrev=40', '--full-index', '--raw'], cwd=/home/mechen/vision-project, universal_newlines=False, shell=None)
+-2019-05-01 21:22:39,718 DEBUG   Thread-13 :9533 [cmd.py:execute():722] Popen(['git', 'version'], cwd=/home/mechen/vision-project, universal_newlines=False, shell=None)
+-2019-05-01 21:22:39,734 DEBUG   Thread-13 :9533 [cmd.py:execute():722] Popen(['git', 'merge-base', 'HEAD', '069fddb15faf7fc142d3d9e1ab7edcbf96845ad1'], cwd=/home/mechen/vision-project, universal_newlines=False, shell=None)
+-2019-05-01 21:22:39,739 INFO    Thread-13 :9533 [run_manager.py:_upsert_run():910] saving pip packages
+-2019-05-01 21:22:39,739 INFO    Thread-13 :9533 [run_manager.py:_upsert_run():912] initializing streaming files api
+-2019-05-01 21:22:39,740 INFO    Thread-13 :9533 [run_manager.py:_upsert_run():919] unblocking file change observer, beginning sync with W&B servers
+-2019-05-01 21:22:39,740 INFO    MainThread:9533 [run_manager.py:wrap_existing_process():1011] informing user process we are ready to proceed
+-2019-05-01 21:22:39,741 INFO    MainThread:9533 [run_manager.py:_sync_etc():1067] entering loop for messages from user process
+-2019-05-01 21:22:40,491 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/diff.patch
+-2019-05-01 21:22:40,492 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-metadata.json
+-2019-05-01 21:22:40,493 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/requirements.txt
+-2019-05-01 21:22:40,493 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:22:40,494 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/config.yaml
+-2019-05-01 21:22:40,503 DEBUG   Thread-2  :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:22:40,591 DEBUG   Thread-2  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 873
+-2019-05-01 21:22:40,598 DEBUG   Thread-15 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:22:40,672 DEBUG   Thread-15 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 758
+-2019-05-01 21:22:40,675 DEBUG   Thread-15 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:22:40,926 DEBUG   Thread-15 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/config.yaml?Expires=1556745820&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=N9v%2Fn1l7FvTF5WD3txI%2B4%2FBmfAdbD1Hz7lT%2FZvlWIn4ZUyelMRbR2TJfZIGWWqP%2B4k7ikzv4zdakPDJSKFe7vmgRCjrWWFI1SsV39dvC7lFcJhLVxkHzXoAyEH99y3aunDXMwVYt84zqEG%2Bf0%2BXTTQY5oA7JS2WQyvA2P0%2FRoxEi9dui0mlNhGmGeC7FCxElTPVBnjjJ06jVQ%2FT%2BhOCyuhW%2BvDrcVlJJox927pbnktkTcMF7LhidQtI82dZqXxukIoZxtrZFekJWIWkMzuLWGD4Jc8qBDWPn0foDtcD1huKffAPO4DeuI%2F0hSgTd4bu0ybcD8OpGwH9BMz4TFOUrFg%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:22:56,497 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-metadata.json
+-2019-05-01 21:23:00,741 DEBUG   Thread-6  :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:23:00,834 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:01,499 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/config.yaml
+-2019-05-01 21:23:01,763 INFO    MainThread:9533 [run_manager.py:_sync_etc():1090] received message from user process: {"save_policy": {"glob": "model-best.h5", "policy": "live"}}
+-2019-05-01 21:23:02,499 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:23:02,933 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:04,962 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:06,974 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:08,502 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-events.jsonl
+-2019-05-01 21:23:09,021 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:11,218 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:11,504 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:23:11,505 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:23:11,505 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:23:11,506 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_0.jpg
+-2019-05-01 21:23:11,507 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:23:11,507 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media
+-2019-05-01 21:23:11,515 DEBUG   Thread-19 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:23:11,520 DEBUG   Thread-18 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:23:11,595 DEBUG   Thread-19 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 784
+-2019-05-01 21:23:11,598 DEBUG   Thread-19 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:23:11,598 DEBUG   Thread-18 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 762
+-2019-05-01 21:23:11,601 DEBUG   Thread-18 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:23:11,811 DEBUG   Thread-19 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_0.jpg?Expires=1556745851&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=cp8uldoaXDnI9%2BeNapGGTNjdceG6v3wg%2BP71xvgz8ocpXKf6B1hIAhHNqjktqLKd87RlFcnVnGlGn8wwNwqVGPV3NWaClRwWWEjh%2Fqhi%2Bo4%2BOIQe8ZAGSirxCLsB38jDqsiQqPA4H4vZoya1Kfx42QmMekm5SqI5SJca%2F7pE3dRld0Ui5Wq4GpGFqoaRxWGaHX%2F7ocxFsUaFtmWDStYRHCN8L8iGgrk7tfNSzsFRavbGt8DCOMxz5Q5e9qy9xxEKGABfPU%2FmwoJVxPBVN2zNPI%2FceHOMRHB5RJMOJBSCNnz9LWhv72hzIe9yvLLjAsj02Tgxvy63N8MHlooX8RyqiA%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:23:11,944 DEBUG   Thread-18 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/model-best.h5?Expires=1556745851&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=cBSTnV5worpxxpiVTkPuRDNeD8743yDRjWM1Ci%2B8v2g72p5B%2Fk3F9FmdyE2pDw9Vs1Mrcxr8mcTv0jTTUWxNiuFCAGdOsnX%2F2yr4sTzw0S18se8EJYJ8EE%2By%2BT4YZEZ7th%2ByCF2xT4X2lG15ulBNaTS2Dqc%2BxKX9ZvYnjpePOC2ygg1of%2BtgOZXC6D%2FCcIO6Oi8UTCEbxSq7BjpLY29aHGwcga4fqwnvPpv0rcD47dn4y8iA8jgDVKA%2FfpsWKxgZW%2BHIk2bnsSrqiPunOBizIfugg9BWm7fDIfCYJ%2FQRUG4jhGx3SBhHYNsyoQBRtCXHUpg35ugggFWqNUj3FYewWg%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:23:12,504 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-metadata.json
+-2019-05-01 21:23:12,505 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:23:13,414 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:15,259 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:17,311 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:19,343 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:19,509 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:23:19,510 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:23:19,510 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:23:19,511 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_1.jpg
+-2019-05-01 21:23:19,511 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:23:19,516 DEBUG   Thread-20 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:23:19,593 DEBUG   Thread-20 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 780
+-2019-05-01 21:23:19,596 DEBUG   Thread-20 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:23:19,813 DEBUG   Thread-20 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_1.jpg?Expires=1556745859&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=WaeBHm8wCZ7%2Fty70uJM%2BqmobZQTCkaYHi077URG4AETNkTEuR8EfatixfKzpyEglMsSs4pR9ixLlaDfh6j8w2qSiNSQ9cuDpjLoyndcraLD3%2BGqfJEUqsVDdMDKjyndxSVdIgvnglHzeAOiSCbcCfy1d9bvsQsi7O474YT0HAEz5BBtZTHpG7IId0D9xokHfzFv8Buk00pCAQR7yrS1MOAgONpWljZOqYiUO%2B7rAjcMYiznSo3fd3h38omQlRO7I71Dj76HzZx5uzGbktqxGqmGVuKXkP2jYE%2BO7jvUd%2FYelKp3KFcFn23X432fpH95Qjn2fY%2BMgQyLfS08uomOFYA%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:23:20,510 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:23:21,366 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:23,379 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:25,438 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:27,470 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:27,515 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:23:27,516 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:23:27,516 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:23:27,516 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_2.jpg
+-2019-05-01 21:23:27,517 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:23:27,521 DEBUG   Thread-21 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:23:27,599 DEBUG   Thread-21 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 786
+-2019-05-01 21:23:27,602 DEBUG   Thread-21 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:23:27,867 DEBUG   Thread-21 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_2.jpg?Expires=1556745867&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=AXiUUgLvLKgvSvJmu4rCJQbFkQnSk83rlH0Mzx3Xbw57Yls7BZ%2Fowivsjul%2Fx3%2BLV7cNN3Aqho519aO5JDBmnS94vjGWjif%2BJeCjWUnULyV3xnzIOqQgh%2B9sxNa59rVEwmOl99khzPlcmxGd40l7ezAx4lQEulQPwPyMUaW8fiReu9m6ZsJSTo%2B22JlLXBDzBh5uP%2FMqGenM9qZMA9F1Ss%2BHhfGfhfYo5MlqqESuFeNdrDis7AhqcP0d0OhIuka7tmDwq4VmxYMgcqwcOBQ1geIHu3C38rQ1R63%2BmQApH6AIPd1iNGu2lw1%2FrawFUCb5tHX8Njt2uz6IFphnm1Sgbg%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:23:28,516 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-metadata.json
+-2019-05-01 21:23:28,516 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:23:29,495 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:31,509 DEBUG   Thread-16 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:23:31,510 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:31,605 DEBUG   Thread-16 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 927
+-2019-05-01 21:23:31,610 DEBUG   Thread-22 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:23:31,687 DEBUG   Thread-22 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 777
+-2019-05-01 21:23:31,690 DEBUG   Thread-22 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:23:31,945 DEBUG   Thread-22 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/config.yaml?Expires=1556745871&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=DLRRGcBNPRxC6ZaJK%2FFMjKP1zHSZSDyhE%2BHzhEMXj%2BMdjlkwHVT9sRHvzY3GrvKBpnYscf5FS%2Bze4SWFWcALp4uKOVx5j5c4TNKD5qEEzGKVHW1duqd4bN04KWKXZprdaba0MZEqrFYbmiralVtiMDgeO9k%2FMeDHOCnsBh20%2B1MRL7nrLuq8pOcbGuWVQWCilQ%2FYmWBYAblmMTuvLrozip2Q%2F%2FehxpP2Bb93YzcLF%2BRzC4EscLp87YbNMImpp3lJxQsK2KQNf6ETiELinkv%2BOejxghxZy0lVH298m76uAv1gmx%2B9kw1vRP%2FqeqIdVkGg1ilLKZkE55E82UIghIWySg%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:23:33,507 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:35,521 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:23:35,521 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:23:35,521 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:23:35,522 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_3.jpg
+-2019-05-01 21:23:35,522 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:23:35,526 DEBUG   Thread-23 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:23:35,543 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:35,600 DEBUG   Thread-23 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 792
+-2019-05-01 21:23:35,603 DEBUG   Thread-23 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:23:35,830 DEBUG   Thread-23 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_3.jpg?Expires=1556745875&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=HQt36q6TEr2CRcDvYhRd4wlhQxjpsOwiL8K%2FHZqOyUA05zo0qjQrTKlC1cNwmDj0Rq2VGcGRzw9e9Cu9XEHAI6m2%2B%2F8Nws%2FP2Ixvu3y0Qh%2BjrqAiBRzkAt6VAhosKww2vD4HyN5dyR9gEzqBUqxLDGGyYjO6%2F3IEdH69yvlTEvhuYGnSZMfFBZk%2Fj38lU7U2gfPTCZIPs%2Bv8%2B2VCRZM13JY3RGwF2MXyCYR6%2F30Sqqy72t7YQRe5JJlLhd5Flhw5NqsYxUScGgQJu2WpNpYhwkcHyiPmdml0Q25%2F%2BeBsB%2FnxhIjuWQWzXqnj0lgbp1IeeKfP6ZMvHh4GTGS79TpkQw%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:23:36,521 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:23:37,551 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:38,523 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-events.jsonl
+-2019-05-01 21:23:42,526 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:23:42,527 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:23:42,527 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_4.jpg
+-2019-05-01 21:23:42,527 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:23:42,532 DEBUG   Thread-24 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:23:42,611 DEBUG   Thread-24 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 784
+-2019-05-01 21:23:42,615 DEBUG   Thread-24 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:23:42,820 DEBUG   Thread-24 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_4.jpg?Expires=1556745882&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=U%2BHBfZyozj0MrTJ%2FAkQguXIUENSEX7IZwv15Vo9US9z%2FamK9nph9OLdBQSPI8EnwGiZTZtWySWAiq7LqlMMTb78KLBieQSW1%2FBMOPaMGqEukThzZYRMh1smcMowmHF5nmKTXLvi6WlKB%2BqrztfZHLPBs6xpJ1zJVLTtbp1t0FZWYk3sdyORGMf9PJR7KhHGWtIqHgWHq2tjnWOyrzOGeukZOZSv%2F9zgxODQ0Mz8e9LoM9HC99C2dRCi0No5EVSZMq38J8CQD6l3CgTdbVdpAnuhAa%2BFQskklaVyhYK1I5%2BQyUKeBEuRSOsnjb1SSUe%2BWj876bDJQggsdc1nUqrd8vg%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:23:43,527 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:23:44,527 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-metadata.json
+-2019-05-01 21:23:47,588 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:50,532 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:23:50,532 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:23:50,533 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:23:50,533 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_5.jpg
+-2019-05-01 21:23:50,534 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:23:50,538 DEBUG   Thread-25 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:23:50,621 DEBUG   Thread-25 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 786
+-2019-05-01 21:23:50,625 DEBUG   Thread-25 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:23:50,888 DEBUG   Thread-25 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_5.jpg?Expires=1556745890&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=mwXkD2EqI5VxcyAdJr93OzJDpt0MKkNa8Z%2BfOc59zLI1d87HhG%2FQk%2B4W25v4ekomGZfBEB8SNKWvVrFcYtxZ4op9bFr8YsFft0Y3HgdayU9oqMV0jXI1nVgJxi%2B8KZWEdGxioKHuWQ%2FGNOJ8IF1NTcnzD7SyGd%2BYDHIaCPlzXdf0jPmDYMnrOePByIXhh9HVCW9ni%2BlwWjl77DMR4MmXM4C6JbMCf3W4LnZTR6IfbyEa51OLUmnbMAa1IS3KCmjj9ltRaKTlOmSf3O76jkKSDMAw73I1YKMh07TMVG7SFkxm0p4FM7%2FpcBw0fSqEj%2Fhp%2Bz9rmJqBLe2aVBEvEDi08w%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:23:51,533 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:23:58,195 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:23:58,538 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:23:58,539 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:23:58,539 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:23:58,539 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_6.jpg
+-2019-05-01 21:23:58,540 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:23:58,544 DEBUG   Thread-26 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:23:58,621 DEBUG   Thread-26 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 792
+-2019-05-01 21:23:58,624 DEBUG   Thread-26 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:23:58,848 DEBUG   Thread-26 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_6.jpg?Expires=1556745898&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=g9QO5i%2B9B%2BcsVZ55rVxeZBnoNbRdGz9uj18UGxPqc0UGJx9gU0EH5G9OXsl0PQmPN%2Bj9uqFTcs%2BnNYf%2BvlhdvikMTP9bsriI4PAGrBHQj6brID8Bs%2FuLglBMXZIHXY8V5SCmrmwa9K0WyzEE%2BFyWQfuD5L%2BrTb4WYEmh71eUiSoDo4yiy8rjWvlKLdCW6saGi7xjhIeumsJHc%2BeWu%2F1Xsx5%2B10utrQ3NLaKkhEfkOMJzyqQIdc0ylrhwx7asCQ2Ov%2FVsgUGcH%2B9IIZVPgrWs3pKGlD5nUpdwJ1TTD7yNR5FcUqjAFTVUN59wvP6r72T8zHPQveZ1UZcYa93T3lvZFQ%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:23:59,539 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:24:00,540 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-metadata.json
+-2019-05-01 21:24:06,544 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:24:06,545 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:24:06,545 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:24:06,545 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_7.jpg
+-2019-05-01 21:24:06,546 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:24:06,550 DEBUG   Thread-27 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:24:06,626 DEBUG   Thread-27 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 782
+-2019-05-01 21:24:06,629 DEBUG   Thread-27 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:24:06,860 DEBUG   Thread-27 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_7.jpg?Expires=1556745906&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=Yp4EzLLoJe%2FW7FmZZOKMxec7dxN7mKGq3ZQr4veuuSQIs%2BBmWJUVd7sPPXMnDAQjOCnGNBSu3bH%2BBfBsH4oHJv8FE6x20QrO6sK5q7NFLG0%2B1w8wkPZKHB8MA0hgsRvK3LG%2BLKwCBOtblKSIN7PhQre1OZwpdp%2FpSpJMIIvaPVhvrsoyny6rV38dgpKTTQoSyhMMISb4uB1DvITiwZcqzUaiZA4u3K7Df09bX5ZaIlZDSDKYmgELOn0eESch8QX40uhdR56VrhGkHkp%2FdwMYZvqf%2BIOzy1ZdNRxOd9DbvafzSvJm6KoAZmzSMWcHJg3anWIwHPKneYjTbvzQsE0woA%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:24:07,545 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:24:08,201 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:24:08,546 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-events.jsonl
+-2019-05-01 21:24:14,550 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:24:14,551 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:24:14,552 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:24:14,553 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_8.jpg
+-2019-05-01 21:24:14,553 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:24:14,558 DEBUG   Thread-29 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:24:14,563 DEBUG   Thread-28 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:24:14,640 DEBUG   Thread-29 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 780
+-2019-05-01 21:24:14,643 DEBUG   Thread-29 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:24:14,660 DEBUG   Thread-28 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 765
+-2019-05-01 21:24:14,663 DEBUG   Thread-28 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:24:14,860 DEBUG   Thread-29 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_8.jpg?Expires=1556745914&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=qk3tgsFOJvT2lYUk0SgDE2kOC49SazS3D5du2XfpJ9xKJ%2BXw0pujLhVIxCs5UCwF8kDqWv5KrvLueyP%2B4N8ZAR5p48sHvU20mpxvNxKrY0gXKELE9tt9quYZjIe4hnTUk7jFj9yA%2BUEchIIKHH0m5FtZvEa3YHORlB7k0nNFhctgWwgIE74B37I0ww7oVQZvFzTeNa0rAaf2w6yCops3YEDYSxAI%2BohFzCznhem1HATP6Z3bkmNSJLBkkw5CdeAqORiepPdA4YQuv7Bj6pF05CMyHMPW%2BoX%2BE0jYJUYwUthWLFuoXteAyqeBq2XFM3nZRDoeWw7BmnF%2BNQu4nO0OTQ%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:24:15,006 DEBUG   Thread-28 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/model-best.h5?Expires=1556745914&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=oRmL3IB7Dyc84WAqo5LnXbRkx6a9PxTYea3oGXjpnTCowyDWadVcmesgWsCJNCxXshKMhm89jxGygUqjDlzOH10kkEuB%2FKq%2BZtXsiiSpXxJH1Fu5VPNgLxJXANuEKYfRXy4DtbEGHqfIwy1lPxh5qvKFaG4Zlsw6tkngbxwICZODv90K769x7UFMq4J3JCBbRPceOvLRR6VRAXieVry1ITfSOE74AOqjTBMdsSLsDixwuHm3zQo09ksIgelikZLwFx2i%2Bwu43GjTItt9o6HPb%2FtK8kLZqgbnIquFdWnm532Cmct90zzyze9W0UEikhakzu%2FUISjU5BzvTOzY52SLXA%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:24:15,551 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:24:16,552 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-metadata.json
+-2019-05-01 21:24:18,234 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:24:22,556 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:24:22,557 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:24:22,557 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:24:22,558 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_9.jpg
+-2019-05-01 21:24:22,558 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:24:22,562 DEBUG   Thread-30 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:24:22,657 DEBUG   Thread-30 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 804
+-2019-05-01 21:24:22,660 DEBUG   Thread-30 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:24:22,858 DEBUG   Thread-30 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_9.jpg?Expires=1556745922&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=oLlsSpcbG%2B1J6M1uBRkODRTHwKtt%2FuKogs2g6CwruKt%2BYNE%2FQYvESDND7QzidO8bnBLmlJ%2F1pMuKpNaS01PfoAkwy5dtNggrfATtksbOJFe9CuIP0IybXk%2BG2F%2BholIcQWSDW7pSXWhhDaUH58Np%2F6ENrz055fywDU9YOeVZ00GmhvCxzsf1cWvtI3gva1Tir7XyQtk%2BPbrkMxFsuyM%2FAW5p8AQ9JEro6B6TIVu08%2BCqosmmoq%2B%2FsXnqMBkQK5Cy7%2BBMQzEF6pIX%2FLLNzlfpte4zGoz50eZQ4IKhfw6EwBqjKFTTeYhvtdQtQbdQzlostM%2Bw6o6ky%2Be%2BzNIkM%2BodYg%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:24:23,557 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:24:28,273 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:24:29,562 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:24:29,562 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:24:29,562 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:24:29,563 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_10.jpg
+-2019-05-01 21:24:29,563 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:24:29,569 DEBUG   Thread-31 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:24:29,646 DEBUG   Thread-31 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 796
+-2019-05-01 21:24:29,649 DEBUG   Thread-31 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:24:29,889 DEBUG   Thread-31 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_10.jpg?Expires=1556745929&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=M7moS190q5q4w99qzzvpg1YiOJ9Nm9XGoDLk%2Bi2n24veeTDM6%2BW%2BidWAKiiU4v0T7xhVsRTILu76crsq6tWa1%2FPT0xaHjkdFscvVj1HxswzhGL%2BqNzYK9vamuA1W%2FFWMNnLQlrl%2BoJBUNQ9u9y8PjKukg%2B8hCGsJc58whAF5bDeH3EEN55g8pAwkg%2BmSzF4wqlZZ5rM15ULM3ig7Co9p99LNYwqMjbH5DX7NJ6zqaWrcxl%2BWikk5usDxfP2%2B%2FA8uS6%2Fvn9X8CuyDJ18uZpG9OS5wXKVWQeAeG7stvEN029RGjj5ZE4wH1V4sxDXCSRfjrNJY5IdkKEI2qnhUcc%2F5iA%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:24:30,562 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:24:30,563 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:24:32,564 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-metadata.json
+-2019-05-01 21:24:37,568 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:24:37,569 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:24:37,569 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_11.jpg
+-2019-05-01 21:24:37,570 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:24:37,574 DEBUG   Thread-32 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:24:37,650 DEBUG   Thread-32 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 790
+-2019-05-01 21:24:37,653 DEBUG   Thread-32 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:24:37,875 DEBUG   Thread-32 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_11.jpg?Expires=1556745937&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=UmGCRgmEjNOuMGW03Dh0r4XHr3CWLKtsLF0CXqwigYNGxD%2B12%2FKHIXPKm7ZWLRWkophNTZ2ZGjoKuaCjHz0Jgbyt4Gv%2BjoDzB1Rljq96QWLEqFpFUQcu9cdVc4ifCY8PLxbialQ0KVbPlHUgs3NDobtKJ3Bf1nVB95Ydb%2FQKMJg235OFE2mdk%2B8vuTrCK3mBPZjWJuGykQuZy777p6Oo4f5%2ByqiioyZmHfR15KXoT3ftC1xwBHEBp%2Belk6UogstP05kEkP1PoRz6kvXtcQp322OidxCeqxyri2jS6l%2B%2BmRgmRLC6hWiusA1Ex36Em4DIvgWXgD9NdB%2FGGEF%2Baao2bQ%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:24:38,256 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:24:38,569 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-events.jsonl
+-2019-05-01 21:24:38,569 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:24:45,575 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:24:45,576 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:24:45,576 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:24:45,576 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_12.jpg
+-2019-05-01 21:24:45,577 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:24:45,581 DEBUG   Thread-33 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:24:45,668 DEBUG   Thread-33 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 790
+-2019-05-01 21:24:45,671 DEBUG   Thread-33 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:24:45,898 DEBUG   Thread-33 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_12.jpg?Expires=1556745945&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=d99e%2F10la4Rn1pxkpIZfSNWBZ9caZeCNK6qE48GiPGWncJ%2FbxiXgxYInrlYQ7ODB1MT6XWp93mKwzM4yZh6%2BI5kZfqmca6EYt52Epbaa92MV6aMlhes9Fz%2FM4HFfnMY030xvLPdXPPpula%2Bkm77fXlm7RzDmFzCuynmieF554Qh22EVth%2Fq4o2HZ8gcWZ9xRCifa7crFSX5w5B6Ck5K3TpcMWnObGBIJ7x%2Frvf%2BM4LdUaRNq%2B7DGFKi6rUNq4EtOc9uaaQRV7MSZxEwGusNVbt4ImfCliqbbyOTWju3o9zm06hD%2BreDevETcY2%2BjbrK8FhSYwRNfxShYdMzIUCNdoA%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:24:46,576 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:24:48,291 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:24:48,578 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-metadata.json
+-2019-05-01 21:24:53,582 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:24:53,582 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:24:53,583 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:24:53,583 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_13.jpg
+-2019-05-01 21:24:53,583 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:24:53,588 DEBUG   Thread-34 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:24:53,679 DEBUG   Thread-34 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 788
+-2019-05-01 21:24:53,682 DEBUG   Thread-34 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:24:53,932 DEBUG   Thread-34 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_13.jpg?Expires=1556745953&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=at9Gh0ZuwH2%2Bp%2Ft%2B43RAOE2gsamlX6%2FqxDGD4Vg53Lxp9RQ2BcIAPdeWX7EjWxLFWG1W5KP55eUMfgs1zJqAe9%2BotD5CM1LEP0UY7JR%2FVEg0VXJSFRjeWLO7ohQ9lFy7WXkzeFLY2WuXwGDp2Ao%2F57npikiJjlbPaVpk%2FWZtNhdreSQY56BsY2FZO6CGeZiiFnTl6aVD6uWU4HQuf%2B7k4aV7hsnoL2u9kZox02zO04HqAqmOcPVZdjR93xH1Lf02nr22xQf6jfvvsOCDGu1JOt9bqpA%2B7zEp7s9STCZlO5MNGnI8OH5F9JD4VYH5KXNHe51FP26w0ZPp5icF7UmYTw%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:24:54,583 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:24:58,359 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:25:01,589 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:25:01,589 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:25:01,590 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:25:01,590 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_14.jpg
+-2019-05-01 21:25:01,590 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:25:01,595 DEBUG   Thread-35 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:25:01,670 DEBUG   Thread-35 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 792
+-2019-05-01 21:25:01,674 DEBUG   Thread-35 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:25:01,910 DEBUG   Thread-35 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_14.jpg?Expires=1556745961&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=D7DodYvOk2Kkom%2F6NjeOYySr6Xj6RvLYNpYIE3HtwzIeusg4AgPA91Tje9F7dL%2B4OoVhPxvzIVxBXXiz5GE4GYL3g9jb%2BQe%2BCbH7VkiBGLMwxSgURPUNRxXsnC%2FfnioZphE%2F2LGQ9PVmfME6A6fQ2WTIA0UojS5uOKqzkL1VDEANDMxk9q%2FJFI%2BzX2RYLfW0TwtdDuCsENBQ5tqtV1heo29I%2FEf0oB3X0p872w3WoJ4dGdmee0iutObWQ0XpM3g3EJuxt03E%2BmXCFKZejfYdPFzuIEuBov2KYZl8fTQokKBQ0uG2%2BPf113VlYGquHlMgTgDrAVssFWVvM8%2BLFgHRZA%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:25:02,590 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:25:04,591 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-metadata.json
+-2019-05-01 21:25:08,594 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:25:08,594 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:25:08,595 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-events.jsonl
+-2019-05-01 21:25:08,595 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_15.jpg
+-2019-05-01 21:25:08,595 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:25:08,599 DEBUG   Thread-36 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:25:08,642 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:25:08,676 DEBUG   Thread-36 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 788
+-2019-05-01 21:25:08,679 DEBUG   Thread-36 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:25:08,952 DEBUG   Thread-36 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_15.jpg?Expires=1556745968&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=N7n46u1XHnc0T%2FfLaU8Vl6H2iDVgOnN7oRXZ2s9BEpyqzldrtwQxr%2FlSKD4FK4BWxTVMhtow1vaGs1Y2y5XvPF7GI3dZuHznwibrS%2Foae6tljBw4RnKJ39sY9v%2BIV37YvPiL1jUWunXYFprz5T%2BJPlhXI%2F4wRySuLHrFu5jN6o%2BfoBCX9wYqHkpCzWWbcwHUsqWs5puohS0sH0vpEeQoX4GbpYLOlADW1NHy8NxyXr%2BWA6b0uojFFBy7aZqFj6qnML2g4usWFsAn13SHlfrzbbvcwPgWHyH92XsdlJ12wE3VG1DrQ%2BYSpBJut8UPiSGGEtA%2Bv6zypEUZTwe2XracMw%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:25:09,595 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:25:16,600 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:25:16,601 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:25:16,603 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:25:16,604 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_16.jpg
+-2019-05-01 21:25:16,604 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:25:16,609 DEBUG   Thread-38 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:25:16,614 DEBUG   Thread-37 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:25:16,691 DEBUG   Thread-37 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 781
+-2019-05-01 21:25:16,694 DEBUG   Thread-37 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:25:16,695 DEBUG   Thread-38 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 802
+-2019-05-01 21:25:16,698 DEBUG   Thread-38 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:25:16,964 DEBUG   Thread-38 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_16.jpg?Expires=1556745976&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=ClSKbJjVmgPT3r6bXeU2VQ8g%2BT4VjPaklEfJ%2FIqqOJ7AIKU7WuuRYIVYT6lt4SnHn3z0oLlo5mUKXdvViwPEp%2BIKF88MYMN1vIk4%2FnSOrsaXWthAAGs0kEW6ir%2FfJAYHEnhXm6nKT8g4kTgU%2BPjokqHPlqiMZjUyD%2FpcUaisrdM7FjMfKBqSxNT0d3wKcg%2FD3u%2FVPAfLoKpgZj4FdQcyE9qJEfsNp%2FFa4%2Bf4OdNRY8xfjeRK30N3AZeELQp%2BsF8JnBSkhSjjMwc6koM9QZlIUuxreSKlXH1WUwF%2FrDPYlGQOdKjoy%2FNdGAoB3mlYwD9rKdsluI7mpetdNa%2FQ1%2Bb%2Bsg%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:25:17,013 DEBUG   Thread-37 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/model-best.h5?Expires=1556745976&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=NfQ6sTmnmMo%2Bjr865JBql9opSk8auQ1ngc0iITKEGACO9r8gYMB6z7SmBtAvAikrD1otL9nNPIPAbh0BzvV6%2BgvaMY%2BnAKsqZrcaaBiDHHtpsQdxcRRftn3vLg44D13r%2FNhpHUhhzxZuwDsLfFw1s0HmWKkPC2M9dvCeTkbcNLmUIS9%2Bwy2cNPMooCrt2lY%2BULHA%2FOYrpXA4xIhIk%2B09brg%2FtxnUB7%2BISFFDeZoaidFTKWKivoylAVXIUAs0JxbwVHY1%2FNluxtZGeVQ157DgBQ95fJzcqi1AmISJXVjQfAunHwj%2FUkFhnk4NQxfKIimMhLRjdnFK1UBMOX%2BSmUhVzg%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:25:17,601 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:25:18,648 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:25:20,604 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-metadata.json
+-2019-05-01 21:25:24,608 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:25:24,608 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:25:24,609 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_17.jpg
+-2019-05-01 21:25:24,609 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:25:24,613 DEBUG   Thread-39 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:25:24,695 DEBUG   Thread-39 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 788
+-2019-05-01 21:25:24,698 DEBUG   Thread-39 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:25:24,900 DEBUG   Thread-39 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_17.jpg?Expires=1556745984&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=pnsrJ1Mu1ccg1ZFSa9opSemt3qkeO0MtHLYWPwEVAkS%2B30bURlxL3jZSaxY2h1oQaOeL9qAvglqyV4ys7syuIsEhn%2FjUlPAvdW%2FGKX3EIBGBexYQ0dRFZeHKMKi%2Bu9LyjBSca6yADylDAEuwClwzQ7uW6NvGRHKN3isRMuj55KAIO9TWAXf8pC5XUNiwSprgtJpFzvOUsVvNs4AWbf1KfmCJ%2BIHMN%2BiPF6hlyETFl2RddKS7vezZwJquO%2FZ9ajNDXYb885Vyqv7kUaq86nddT3uDTurg8%2BFUup5j3eU0Duy8od%2BfPfSxH1HFOzQX%2BCl2rioIzUI3k3mPFvwFxVZEag%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:25:25,609 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:25:28,663 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:25:32,615 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/model-best.h5
+-2019-05-01 21:25:32,615 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:25:32,616 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:25:32,616 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_18.jpg
+-2019-05-01 21:25:32,616 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:25:32,620 DEBUG   Thread-40 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:25:32,697 DEBUG   Thread-40 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 784
+-2019-05-01 21:25:32,700 DEBUG   Thread-40 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:25:32,967 DEBUG   Thread-40 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_18.jpg?Expires=1556745992&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=DN87w7aJpteunrf6qWKMPxEUP%2Fj%2BjdCIgWht93%2Fpd70tZttGwlRmRN0oFPeGL2ALEZM8JUNMBRiTTJ69YJ8D9qH9O3WfdPU2zvSw6hQoh5tsULPgmkdfQo20b7Tz6XOKejoI7uYfyMRABg6lAP99yq89XfhzZ4CnbeMz4pRJif%2FTCRJEpxRcBPb1JbpG3s3fHNIY9nVhAIghOuD3Pp2vLcvfEPfg0ssAeKJ%2FPLoQ%2Fg19VYODcK0CTaJLGeUD7tgsCv6vCtxt2U6jsdnxHBQkblqQUMFY3bNdkuRO8EYr9zk%2BlMI%2FKSnRuO3M98v3uUnjttP2dMsPGWZiUiqSkbbCxw%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:25:33,616 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:25:36,618 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-metadata.json
+-2019-05-01 21:25:38,620 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-events.jsonl
+-2019-05-01 21:25:38,694 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:25:39,947 INFO    MainThread:9533 [run_manager.py:_sync_etc():1090] received message from user process: {"exitcode": 0}
+-2019-05-01 21:25:39,947 INFO    MainThread:9533 [run_manager.py:_sync_etc():1171] closing log streams and sending exitcode to W&B
+-2019-05-01 21:25:39,948 INFO    MainThread:9533 [run_manager.py:shutdown():926] shutting down system stats and metadata service
+-2019-05-01 21:25:40,621 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-summary.json
+-2019-05-01 21:25:40,622 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-history.jsonl
+-2019-05-01 21:25:40,623 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-events.jsonl
+-2019-05-01 21:25:40,623 INFO    Thread-2  :9533 [run_manager.py:_on_file_created():576] file/dir created: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images/examples_19.jpg
+-2019-05-01 21:25:40,623 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:25:40,627 DEBUG   Thread-41 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:25:40,704 DEBUG   Thread-41 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 790
+-2019-05-01 21:25:40,707 DEBUG   Thread-41 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:25:40,776 INFO    MainThread:9533 [run_manager.py:shutdown():931] stopping streaming files and file change observer
+-2019-05-01 21:25:40,925 DEBUG   Thread-41 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/media/images/examples_19.jpg?Expires=1556746000&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=YIwD5zQoWy5%2BFJ2%2F7D6PWnmPPB8Zg9%2FI771Z%2FUY8%2Bcz8WGWma7VUwwoHP26bJsW3%2FCUWMlINJ%2BsHxeY5fxte3YT7y7rrH7gKiswl36VZmGVO0G9ZKOkiZVNiZr4cWW%2FjURDrlJ8ChGTXMDg9HqWFXRcQHFaZB4Qo9h22%2FFPq4Q7JromWIyCmdBoJrHptWQJc0g60ONW4Zm41EcvgE1aFj2%2FfKJ5qVCilgNdHvzlDI5Q%2BpwKFgAh4BC0veRQ6hhMCw2NjvXwQst55qcdEHKqSvYRuH9b3wGnF9aUBGEkwefjlW8nPXFlOGLqgPHHZ3tsW6QUXg2a0E172O5jSL2KeWw%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:25:41,622 INFO    Thread-2  :9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/wandb-metadata.json
+-2019-05-01 21:25:41,624 INFO    MainThread:9533 [run_manager.py:_on_file_modified():587] file/dir modified: /home/mechen/vision-project/wandb/run-20190501_212238-2jyf0w0w/media/images
+-2019-05-01 21:25:41,628 DEBUG   Thread-42 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:25:41,636 DEBUG   Thread-44 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:25:41,636 DEBUG   Thread-43 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:25:41,700 DEBUG   MainThread:9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:25:41,708 DEBUG   Thread-42 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 752
+-2019-05-01 21:25:41,711 DEBUG   Thread-42 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:25:41,712 DEBUG   Thread-44 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 768
+-2019-05-01 21:25:41,716 DEBUG   Thread-44 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:25:41,716 DEBUG   Thread-43 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 770
+-2019-05-01 21:25:41,721 DEBUG   Thread-43 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:25:41,796 DEBUG   MainThread:9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 927
+-2019-05-01 21:25:41,801 DEBUG   Thread-46 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:25:41,804 DEBUG   Thread-45 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:25:41,877 DEBUG   Thread-45 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 767
+-2019-05-01 21:25:41,878 DEBUG   Thread-46 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 778
+-2019-05-01 21:25:41,882 DEBUG   Thread-45 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:25:41,884 DEBUG   Thread-46 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:25:41,922 DEBUG   Thread-44 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/requirements.txt?Expires=1556746001&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=k9wD0LHQX4xJkPj%2Bz2r%2F97yDd3eXLD5DwEVd2O3aWgSTCVS3Qct%2FcINcjTRfu3sO6mng2GWuhqjSgMZDvlSx%2FHwhlQ8wEAtOPKRgNqMPcyefFb7DA2%2Fjth5m1jXr2IQTGbbBMRuzdv8aVSX1GsIvKEKMUhX3ySvAxzhnQZkFGG9zMTFnwMIJwqGNXU%2FWRGqTz7kQr%2BVvUa2uDnjaLYp5srEMzFiR7Zb%2FTonb8ZR0X5UBjub5ZmiG%2BgxvVzXw80%2BrXWUmT3MDulcjhvZuAYGkBXQxmxSHDGZtfdiCtbg9v99Doff2FZJKl9JB5ktREmWdYAfVoXPlj%2F%2FAk7x3NA2vmQ%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:25:41,967 DEBUG   Thread-43 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/wandb-metadata.json?Expires=1556746001&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=Og8vFpK8sb5S46nzCbaLj9atNFia%2BTn%2BNJzJ85NxVu4KmkMT1f7668bNlcRRMicmziHsYoV8gzPbTUa4d7XESB%2B%2F%2F7TOUhIQDdrgbX8jAibiDrrKiWPqmhy8Hi3Nlpl4eM85vUDq5hFS7UCknXGyOy28HKq2o7gbnsohOFbZmPg0Mr9uKA%2BRpNnsQnFWIQcoIe1WL%2FFTedFL6hLXreIjZ13kRQKz5mtSCPrZiKv%2FcJZPjUuWcHWMCXfTT8BmFF51NiSpfj5d1Ge6uvmnFhxs9jX9J5dTPKCe8gw1q5%2B6jiM1CYMXaXMWzpL%2F0tEuE3aHjU05qZ7Yr3TbBhAmVxod9Q%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:25:41,970 DEBUG   Thread-42 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/diff.patch?Expires=1556746001&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=i5V7Lo5tmlOiW6bVlMAJ8ogYB2ukcQ3eW0nbGUi4ME15TZnDfItm8POfpFnlJIb1sp5EGsVB79u%2Bfi9r8pstrhh2ynLyQOByfCRNDMxg9WkkYGOn3oc6dbmC%2B0mxYX8KxJEB3W%2FL%2BfMjzxjO87THsaOn0MdoAG%2FPvbpsnLZVNioCttVyYJY1tPiVka03E27u%2BLhJmpkgyMp0hnvyJqJqflulRxxQDnrI82yXSKBQUPEi%2B0HyIPMyMIabwfpmt7f8GHNTKvaYpsMKdfwjB8FFASMpIGJctcJiOb1oqPmaq%2BJiIODX06xMSjh%2BOa3dszExoIOWdGGliZr2olk%2FOSTDrQ%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:25:42,078 DEBUG   Thread-45 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/config.yaml?Expires=1556746001&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=hCjLSFqw5AxHRP4uGHxmlPQhvzrXCdvTwnToNyEgYNAN1t0iR1JfUNRwlLNOrc%2FNBQ34zonbHFfjs%2FlQPM750x7Am4gWYwyx1cpXQ%2BK7a8tc1plcNDrp%2FD28zkYroUUyCl7ZmfXWB%2FdxVw1gskwDNmGcx%2Bza9o41zO61N4BTsDXNHnMRF%2FMbEcMIVsiXoC1qVz7ktvbEj65m0YNz8ip69ddArnvuLRxGLO1xgmtX2zriDgoSdHJdhWm932mqgG5gg0bHEgmnxdA86mS%2BudHHhUZTmNtk09woqz8eLDWJD3hwTDpQFOE4jzta58u3PytpeHQwmBTqnyfITQlNOSjCCw%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:25:42,110 DEBUG   Thread-46 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/wandb-summary.json?Expires=1556746001&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=HYqjRmuE6IPp6oB%2FiC4hIuSz4CwieJb8o9%2Fy2%2BTm4aULJ0NPzyeLllNnZm4OWtSU9EoXCjpm1iY5ranwhDEHq%2Fh21EtXtNl4ioo7ydUriS2COAFEqzbZodn6ua9gVKUsm9Za4NDffWWZV3jlP7lakFi3B0iM75dCaBZ7qg0pUeX%2FRLVXgFADgGe%2Fk6fFdFbtDjUDBWpszEAvtNEn8hZBWThA6%2F2Ui%2BeA2Fmp8s%2F371uqXK2mxnSI%2BAxY5G%2Bi15G6nMUxspbp8%2BuEnpRkpj%2FJlg%2FV4f4YdEroQ37hAouLOhUizSOc45NqM%2FBMzU8dLiHxbVgCHJijuqSXT9BXuDyfYw%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:25:42,669 DEBUG   Thread-47 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-05-01 21:25:42,741 DEBUG   Thread-47 :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 775
+-2019-05-01 21:25:42,744 DEBUG   Thread-47 :9533 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-05-01 21:25:42,816 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 312
+-2019-05-01 21:25:42,879 DEBUG   Thread-6  :9533 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /mlclass/emotion-may1/2jyf0w0w/file_stream HTTP/1.1" 200 309
+-2019-05-01 21:25:42,881 INFO    MainThread:9533 [run_manager.py:_sync_etc():1189] rendering summary
+-2019-05-01 21:25:42,882 INFO    MainThread:9533 [run_manager.py:_sync_etc():1220] syncing files to cloud storage
+-2019-05-01 21:25:43,036 DEBUG   Thread-47 :9533 [connectionpool.py:_make_request():393] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/mlclass/emotion-may1/2jyf0w0w/model-best.h5?Expires=1556746002&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=iLD2mvc4RqzWoh7EZPZdj16hn5jFjtmMFdrcsIdYPrJ0%2BhvVxviv3VxmgtOXsUNMUM2cenxacgu3PsHer3TuqJ4aaiBHtByK6P19kfJaWdLpwdx31k3k3Br2y3VtMDWDZ02LOFf6fZql%2FaQABlcdEjnW%2B4RLJYNRAVMHHgLWnaQhiifQdYfyQryeXoyYj0TiG%2FZjgsqVWQnAhj6cbE1hPPtwuB%2FcsMqP3FnSiVwt%2FYpZh%2FsdTG%2BnwacOkvil9tbzKusncuXIGJYawhmH74Y8BLS6YM0sP0vLFshNsaoQBSAaih3YcDTCzhU8x%2Fu1ECSyVfdziVlbBc%2FBgW0O2sKl9Q%3D%3D HTTP/1.1" 200 0
+-2019-05-01 21:25:44,135 INFO    MainThread:9533 [run_manager.py:_sync_etc():1282] syncing complete: https://app.wandb.ai/mlclass/emotion-may1/runs/2jyf0w0w
+-2019-05-01 21:25:44,135 INFO    MainThread:9533 [2jyf0w0w:run_manager.py:_sync_etc():1282] syncing complete: https://app.wandb.ai/mlclass/emotion-may1/runs/2jyf0w0w
++2019-05-03 16:56:47,073 DEBUG   MainThread:100 [wandb_config.py:_load_defaults():81] no defaults not found in config-defaults.yaml
++2019-05-03 16:56:47,081 DEBUG   MainThread:100 [cmd.py:execute():722] Popen(['git', 'cat-file', '--batch-check'], cwd=/home/mechen/vision-project, universal_newlines=False, shell=None)
++2019-05-03 16:56:47,086 DEBUG   MainThread:100 [cmd.py:execute():722] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=/home/mechen/vision-project, universal_newlines=False, shell=None)
++2019-05-03 16:56:47,097 DEBUG   MainThread:100 [run_manager.py:__init__():452] Initialized sync for emotion-may1/pqx0um9k
++2019-05-03 16:56:47,100 INFO    MainThread:100 [run_manager.py:wrap_existing_process():994] wrapping existing process 92
++2019-05-03 16:56:47,100 WARNING MainThread:100 [io_wrap.py:register():104] SIGWINCH handler was not None: <Handlers.SIG_DFL: 0>
++2019-05-03 16:56:47,103 DEBUG   MainThread:100 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): pypi.org:443
++2019-05-03 16:56:47,168 DEBUG   MainThread:100 [connectionpool.py:_make_request():393] https://pypi.org:443 "GET /pypi/wandb/json HTTP/1.1" 200 31060
++2019-05-03 16:56:47,191 INFO    MainThread:100 [run_manager.py:init_run():810] system metrics and metadata threads started
++2019-05-03 16:56:47,192 INFO    MainThread:100 [run_manager.py:init_run():844] upserting run before process can begin, waiting at most 10 seconds
++2019-05-03 16:56:47,201 DEBUG   Thread-13 :100 [connectionpool.py:_new_conn():813] Starting new HTTPS connection (1): api.wandb.ai:443
++2019-05-03 16:56:47,309 DEBUG   Thread-13 :100 [connectionpool.py:_make_request():393] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 375
++2019-05-03 16:56:47,312 INFO    Thread-13 :100 [run_manager.py:_upsert_run():908] saving patches
++2019-05-03 16:56:47,313 DEBUG   Thread-13 :100 [cmd.py:execute():722] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=/home/mechen/vision-project, universal_newlines=False, shell=None)
++2019-05-03 16:56:47,319 DEBUG   Thread-13 :100 [cmd.py:execute():722] Popen(['git', 'diff', '--cached', '--abbrev=40', '--full-index', '--raw'], cwd=/home/mechen/vision-project, universal_newlines=False, shell=None)
++2019-05-03 16:56:47,324 DEBUG   Thread-13 :100 [cmd.py:execute():722] Popen(['git', 'diff', '--abbrev=40', '--full-index', '--raw'], cwd=/home/mechen/vision-project, universal_newlines=False, shell=None)
++2019-05-03 16:56:47,329 DEBUG   Thread-13 :100 [cmd.py:execute():722] Popen(['git', 'version'], cwd=/home/mechen/vision-project, universal_newlines=False, shell=None)

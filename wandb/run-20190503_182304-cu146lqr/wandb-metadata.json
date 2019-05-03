@@ -1,0 +1,24 @@
+{
+    "root": "/home/mechen/vision-project",
+    "git": {
+        "remote": "https://github.com/tianxiang84/new-vision-project.git",
+        "commit": "1a599677dbe9cb8172e834e6be2059b2dec5f3ec"
+    },
+    "email": "mechen@optowares.com",
+    "startedAt": "2019-05-03T18:23:04.696131",
+    "host": "jupyter-mechen",
+    "username": "mechen",
+    "os": "Linux-4.14.91+-x86_64-with-Ubuntu-18.04-bionic",
+    "python": "3.6.7",
+    "gpu": "Tesla K80",
+    "gpu_count": 1,
+    "cpu_count": 2,
+    "program": "train_emotion_classifier.py",
+    "cuda": "10.0.130",
+    "args": [],
+    "state": "failed",
+    "heartbeatAt": "2019-05-03T18:23:28.491318",
+    "jobType": null,
+    "mode": "run",
+    "exitcode": 1
+}

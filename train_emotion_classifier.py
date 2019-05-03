@@ -29,14 +29,14 @@ from wandb.keras import WandbCallback
 run = wandb.init()
 config = run.config
 config.first_layer_convs = 32
-config.first_layer_conv_width = 5
-config.first_layer_conv_height = 5
-config.dropout = 0.2
+config.first_layer_conv_width = 3
+config.first_layer_conv_height = 3
+config.dropout = 0.4
 config.dense_layer_size = 128
-config.img_width = 299
-config.img_height = 299
+config.img_width = 48
+config.img_height = 48
 config.batch_size = 32
-config.num_epochs = 20
+config.num_epochs = 10
 
 input_shape = (48, 48, 1)
 
@@ -93,17 +93,15 @@ model.add(Conv2D(32,
                  (config.first_layer_conv_width, config.first_layer_conv_height),
                  input_shape=(48, 48, 1),
                  activation='relu'))
-model.add(MaxPooling2D(pool_size=(4,4)))
-model.add(Dropout(0.5))
-model.add(Conv2D(64,(5,5),
+
+model.add(Conv2D(64,(3,3),
                  activation='relu'))
-model.add(MaxPooling2D(pool_size=(4,4)))
-model.add(Dropout(0.5))
+model.add(Dropout(0.4))
 model.add(Flatten(input_shape=input_shape))
 model.add(Dense(config.dense_layer_size, activation='relu'))
 model.add(Dense(config.dense_layer_size, activation='relu'))
+model.add(Dense(config.dense_layer_size, activation='relu'))
 
-model.add(Dense(num_classes, activation="softmax"))
 
 model.compile(optimizer='adam', loss='categorical_crossentropy',
 metrics=['accuracy'])
